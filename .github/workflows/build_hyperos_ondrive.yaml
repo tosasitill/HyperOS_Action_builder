@@ -1,0 +1,74 @@
+name: build_haydn_hos_1drv
+on:
+  workflow_dispatch:
+    inputs:
+      STOCK_URL:
+        description: "待操作的底包/xiaomi.eu底包下载地址"
+        required: true
+        default: 'https://airtel.bigota.d.miui.com/V14.0.23.4.17.DEV/miui_HAYDN_V14.0.23.4.17.DEV_c268ec09f4_13.0.zip'
+      PORT_URL:
+        description: "待操作的移植包下载地址"
+        required: true
+        
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - name: 最大化构建环境
+        uses: easimon/maximize-build-space@master
+        with:
+          swap-size-mb: 8192
+          remove-dotnet: 'true'
+          remove-android: 'true'
+          remove-haskell: 'true'
+      - name: 检出仓库文件
+        uses: actions/checkout@main
+      - name: 1.准备环境
+        run: |
+          start_time=$SECONDS
+          sudo apt install python3 python3-pip aria2 zip p7zip-full tar zipalign zstd openjdk-8-jre android-sdk-libsparse-utils
+          sudo apt --fix-broken install
+          sudo apt update --fix-missing
+          pip3 install --upgrade pip
+          pip3 install pycryptodome
+          pip3 install setuptools
+          pip3 install docopt
+          pip3 install requests
+          pip3 install beautifulsoup4
+          pip3 install --ignore-installed pyyaml
+          curl https://rclone.org/install.sh | sudo bash
+          mkdir -p ~/.config/rclone/
+          unzip -P ${{ secrets.PASSWORD }} "$GITHUB_WORKSPACE"/tools/rclone.zip -d ~/.config/rclone/
+      - name: 2.克隆仓库
+        run: |
+          git clone --depth 1 https://github.com/tosasitill/HyperOS_Action_builder hyperos_port
+          aria2c -s 10 -x 10 -o devices.zip -d ./hyperos_port "${{ secrets.LINK }}"
+          cd hyperos_port
+          mkdir devices
+          cd devices
+          7z x ../devices.zip
+          cd ..
+          rm -rf devices.zip
+      - name: 3. 开始移植
+        run: |
+          ls 
+          cd hyperos_port
+          sudo bash port.sh "${{ github.event.inputs.STOCK_URL }}" "${{ github.event.inputs.PORT_URL }}" | tee HyperOS_portlog.log
+      - name: 4.上传到 OneDrive
+        run: |
+            rclone sync -P ./hyperos_port/out/*.zip tosasitill_hyper:/haydn
+            cd ${{ github.workspace }}
+            touch info.md
+            echo "提交日期：$(TZ=Asia/Shanghai date '+%Y-%m-%d %H:%M:%S')" >> info.md
+            echo "本次移植共耗时 ${elapsed_time} 秒" >> info.md
+            echo "移植底包链接：${{ github.event.inputs.STOCK_URL }}" >> info.md
+            echo "移植机型链接：${{ github.event.inputs.PORT_URL }}" >> info.md
+            echo "tosasitill made with love 0202 & 0227" >> info.md
+            
+      - name: 5.上传本次打包 LOG 至 Release
+        uses: ncipollo/release-action@v1.12.0
+        with:
+            artifacts: "/home/runner/work/action_build/action_build/hyperos_port/HyperOS_portlog.log"
+            bodyfile: "${{ github.workspace }}/info.md"
+            tag: "OUTPUT_${{ env.BUILD_TIME }}_${{ github.run_id }}"
+            token: ${{ secrets.GITHUB_TOKEN }}

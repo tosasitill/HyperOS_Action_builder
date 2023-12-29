@@ -1,0 +1,87 @@
+#!/sbin/sh
+
+OUTFD=/proc/self/fd/$2
+ZIPFILE="$3"
+ZIPNAME=${ZIPFILE##*/}
+
+ui_print() {
+	echo -e "ui_print $1\nui_print" >>$OUTFD
+}
+
+package_extract_file() {
+	ui_print "- 正在刷写分区 $(echo $2 | cut -d '/' -f6) "
+	unzip -p "$ZIPFILE" $1 >$2
+}
+
+package_extract_zstd() {
+	ui_print "- 正在刷写分区 $(echo $2 | cut -d '/' -f6) "
+	unzip -p "$ZIPFILE" $1 | /tmp/bin/android/zstd -c -d >$2
+}
+
+[ -d /tmp ] && rm -rf /tmp
+mkdir -p /tmp
+unzip "$ZIPFILE" bin/android/zstd -d /tmp
+chmod -R 0755 /tmp
+ui_print " "
+ui_print "       欢迎刷入 $ZIPNAME"
+ui_print " "
+ui_print " "
+ui_print "- 开始刷机"
+ui_print " "
+
+#boot
+if [[ $ZIPFILE == *Root* ]]; then
+    package_extract_file "boot_magisk.img" "/dev/block/bootdevice/by-name/boot"
+else
+    package_extract_file "boot_official.img" "/dev/block/bootdevice/by-name/boot"
+fi
+
+
+#firmware
+package_extract_file "firmware-update/vbmeta_system.img" "/dev/block/bootdevice/by-name/vbmeta_system"
+package_extract_file "firmware-update/vbmeta.img" "/dev/block/bootdevice/by-name/vbmeta"
+package_extract_file "firmware-update/dtbo.img" "/dev/block/bootdevice/by-name/dtbo"
+package_extract_file "firmware-update/logo.img" "/dev/block/bootdevice/by-name/logo"
+package_extract_file "firmware-update/hyp.mbn" "/dev/block/bootdevice/by-name/hypbak"
+package_extract_file "firmware-update/devcfg.mbn" "/dev/block/bootdevice/by-name/devcfgbak"
+package_extract_file "firmware-update/abl.elf" "/dev/block/bootdevice/by-name/ablbak"
+package_extract_file "firmware-update/qupv3fw.elf" "/dev/block/bootdevice/by-name/qupfwbak"
+package_extract_file "firmware-update/storsec.mbn" "/dev/block/bootdevice/by-name/storsecbak"
+package_extract_file "firmware-update/aop.mbn" "/dev/block/bootdevice/by-name/aopbak"
+package_extract_file "firmware-update/tz.mbn" "/dev/block/bootdevice/by-name/tzbak"
+package_extract_file "firmware-update/cmnlib.mbn" "/dev/block/bootdevice/by-name/cmnlibbak"
+package_extract_file "firmware-update/cmnlib64.mbn" "/dev/block/bootdevice/by-name/cmnlib64bak"
+package_extract_file "firmware-update/hyp.mbn" "/dev/block/bootdevice/by-name/hyp"
+package_extract_file "firmware-update/xbl_4.elf" "/dev/block/bootdevice/by-name/xbl_4"
+package_extract_file "firmware-update/devcfg.mbn" "/dev/block/bootdevice/by-name/devcfg"
+package_extract_file "firmware-update/dspso.bin" "/dev/block/bootdevice/by-name/dsp"
+package_extract_file "firmware-update/abl.elf" "/dev/block/bootdevice/by-name/abl"
+package_extract_file "firmware-update/qupv3fw.elf" "/dev/block/bootdevice/by-name/qupfw"
+package_extract_file "firmware-update/uefi_sec.mbn" "/dev/block/bootdevice/by-name/uefisecapp"
+package_extract_file "firmware-update/storsec.mbn" "/dev/block/bootdevice/by-name/storsec"
+package_extract_file "firmware-update/xbl_config_4.elf" "/dev/block/bootdevice/by-name/xbl_config_4"
+package_extract_file "firmware-update/featenabler.mbn" "/dev/block/bootdevice/by-name/featenabler"
+package_extract_file "firmware-update/aop.mbn" "/dev/block/bootdevice/by-name/aop"
+package_extract_file "firmware-update/tz.mbn" "/dev/block/bootdevice/by-name/tz"
+package_extract_file "firmware-update/xbl_5.elf" "/dev/block/bootdevice/by-name/xbl_5"
+package_extract_file "firmware-update/km4.mbn" "/dev/block/bootdevice/by-name/keymaster"
+package_extract_file "firmware-update/BTFM.bin" "/dev/block/bootdevice/by-name/bluetooth"
+package_extract_file "firmware-update/cmnlib.mbn" "/dev/block/bootdevice/by-name/cmnlib"
+package_extract_file "firmware-update/NON-HLOS.bin" "/dev/block/bootdevice/by-name/modem"
+package_extract_file "firmware-update/xbl_config_5.elf" "/dev/block/bootdevice/by-name/xbl_config_5"
+package_extract_file "firmware-update/cmnlib64.mbn" "/dev/block/bootdevice/by-name/cmnlib64"
+
+#super
+unzip -p "$ZIPFILE" "firmware-update/super_empty.img" >/dev/block/bootdevice/by-name/super
+package_extract_zstd "super.zst" "/dev/block/bootdevice/by-name/super"
+
+ui_print " "
+ui_print "- 刷机完毕"
+ui_print " "
+ui_print " "
+ui_print "- 红色挂载报错请直接忽略"
+ui_print "- 红色挂载报错请直接忽略"
+ui_print "- 红色挂载报错请直接忽略"
+ui_print " "
+ui_print " "
+exit 0
