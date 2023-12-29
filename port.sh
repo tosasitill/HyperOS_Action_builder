@@ -938,5 +938,3 @@ if [[ $pack_type == "EROFS" ]];then
     yellow "检测到打包类型为EROFS,请确保官方内核支持，或者在devices机型目录添加有支持EROFS的内核，否者将无法开机！" "EROFS filesystem detected. Ensure compatibility with the official boot.img or ensure a supported boot_tv.img is placed in the device folder."
     pack_type="ROOT_"${pack_type}
 fi
-
-
