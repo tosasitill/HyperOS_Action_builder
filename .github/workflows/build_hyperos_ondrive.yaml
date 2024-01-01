@@ -57,6 +57,8 @@ jobs:
       - name: 4.上传到 OneDrive
         run: |
             rclone sync -P ./hyperos_port/out/*.zip tosasitill_hyper:/haydn
+            end_time=$SECONDS
+            elapsed_time=$((end_time - start_time))
             cd ${{ github.workspace }}
             touch info.md
             echo "提交日期：$(TZ=Asia/Shanghai date '+%Y-%m-%d %H:%M:%S')" >> info.md
