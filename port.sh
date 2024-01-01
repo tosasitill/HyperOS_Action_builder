@@ -977,11 +977,6 @@ mv out/hyperos_${device_code}_${port_rom_version}.zip out/HyperOS_${device_code}
 green "移植完毕" "Porting completed"    
 green "输出包路径：" "Output: "
 green "$(pwd)/out/HyperOS_${device_code}_${port_rom_version}_${hash}_${port_android_version}_${port_rom_code}_${pack_timestamp}_${pack_type}.zip"
-end_time=$SECONDS
-
-# 计算运行时间
-elapsed_time=$((end_time - start_time))
-green "本次移植共耗时${elapsed_time} 秒"
 if [[ $pack_type == "EROFS" ]];then
     yellow "检测到打包类型为EROFS,请确保官方内核支持，或者在devices机型目录添加有支持EROFS的内核，否者将无法开机！" "EROFS filesystem detected. Ensure compatibility with the official boot.img or ensure a supported boot_tv.img is placed in the device folder."
     pack_type="ROOT_"${pack_type}
