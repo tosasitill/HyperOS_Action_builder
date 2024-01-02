@@ -751,8 +751,12 @@ for i in $(find build/portrom/images -type f -name "build.prop");do
 done
 
 # 修复各种疑难杂症
+echo "# tosasitill here made with love" >> build/portrom/images/product/etc/build.prop
 echo "ro.miui.cust_erofs=0" >> build/portrom/images/product/etc/build.prop
+echo "# tosasitill here 0202 & 0227" >> build/portrom/images/system/system/build.prop
 echo "ro.crypto.state=encrypted" >> build/portrom/images/system/system/build.prop
+echo "debug.game.video.support=true" >> build/portrom/images/system/system/build.prop
+echo "debug.game.video.speed=true" >> build/portrom/images/system/system/build.prop
 sed -i "s/persist\.sys\.millet\.cgroup1/#persist\.sys\.millet\.cgroup1/" build/portrom/images/vendor/build.prop
 
 # Millet fix
