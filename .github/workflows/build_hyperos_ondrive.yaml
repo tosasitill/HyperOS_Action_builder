@@ -5,7 +5,7 @@ on:
       STOCK_URL:
         description: "待操作的底包/xiaomi.eu底包下载地址"
         required: true
-        default: 'https://airtel.bigota.d.miui.com/V14.0.23.4.17.DEV/miui_HAYDN_V14.0.23.4.17.DEV_c268ec09f4_13.0.zip'
+        default: 'https://bigota.d.miui.com/V14.0.23.4.17.DEV/miui_HAYDN_V14.0.23.4.17.DEV_c268ec09f4_13.0.zip'
       PORT_URL:
         description: "待操作的移植包下载地址"
         required: true
@@ -39,6 +39,12 @@ jobs:
           curl https://rclone.org/install.sh | sudo bash
           mkdir -p ~/.config/rclone/
           unzip -P ${{ secrets.PASSWORD }} "$GITHUB_WORKSPACE"/tools/rclone.zip -d ~/.config/rclone/
+
+      - name: Add MIUI/HyperOS ROMs hosts to /etc/hosts
+        run: |
+          sudo echo "123.6.13.6 bigota.d.miui.com" | sudo tee -a /etc/hosts
+          sudo echo "123.6.13.6 hugeota.d.miui.com" | sudo tee -a /etc/hosts
+   
       - name: 2.克隆仓库
         run: |
           git clone --depth 1 https://github.com/tosasitill/HyperOS_Action_builder hyperos_port
