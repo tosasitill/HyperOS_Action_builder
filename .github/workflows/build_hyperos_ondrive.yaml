@@ -47,7 +47,7 @@ jobs:
    
       - name: 2.克隆仓库
         run: |
-          git clone --depth 1 https://github.com/tosasitill/HyperOS_Action_builder hyperos_port
+          git clone --depth 1 https://github.com/tosasitill/HyperOS_Action_builder hyperos_port -b tosasitill-patch_fuxi.DEV
           aria2c -s 10 -x 10 -o devices.zip -d ./hyperos_port "${{ secrets.LINK }}"
           cd hyperos_port
           mkdir devices
