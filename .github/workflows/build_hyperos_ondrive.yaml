@@ -82,7 +82,7 @@ jobs:
       - name: 5.上传本次打包 LOG 至 Release
         uses: ncipollo/release-action@v1.12.0
         with:
-            artifacts: "/home/runner/work/HyperOS_Action_builder/HyperOS_Action_builder/hyperos_port/build/portrom/system/system/framework/services.jar"
+            artifacts: "/home/runner/work/HyperOS_Action_builder/HyperOS_Action_builder/hyperos_port/build/portrom/images/system/system/framework/services.jar"
             bodyfile: "${{ github.workspace }}/info.md"
             tag: "OUTPUT_${{ env.BUILD_TIME }}_${{ github.run_id }}"
             token: ${{ secrets.GITHUB_TOKEN }}
