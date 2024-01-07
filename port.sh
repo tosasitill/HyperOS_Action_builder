@@ -647,16 +647,6 @@ else
     echo "ro.surface_flinger.set_idle_timer_ms=2147483647" >> build/portrom/images/vendor/default.prop
     echo "ro.surface_flinger.set_touch_timer_ms=2147483647" >> build/portrom/images/vendor/default.prop
     echo "ro.surface_flinger.set_display_power_timer_ms=2147483647" >> build/portrom/images/vendor/default.prop
-    echo "ro.surface_flinger.enable_frame_rate_override=false" >> build/portrom/images/vendor/build.prop
-    sed -i "s/persist.sys.miui_animator_sched.bigcores=.*/persist.sys.miui_animator_sched.bigcores=4-6/" build/portrom/images/product/etc/build.prop
-    sed -i "s/persist.sys.miui_animator_sched.big_prime_cores=.*/persist.sys.miui_animator_sched.big_prime_cores=4-7/" build/portrom/images/product/etc/build.prop
-    echo "persist.sys.miui.sf_cores=4-7"
-    echo "persist.sys.minfree_def=73728,92160,110592,154832,482560,579072" 
-    echo "persist.sys.minfree_6g=73728,92160,110592,258048,663552,903168" 
-    echo "persist.sys.minfree_8g=73728,92160,110592,387072,1105920,1451520"
-    echo "persist.vendor.display.miui.composer_boost=4-7"
-    echo "persist.sys.background_blur_supported=true" >> build/portrom/images/product/etc/build.prop
-    echo "persist.sys.background_blur_version=2" >> build/portrom/images/product/etc/build.prop
     APKTOOL="apktool"
     mkdir -p tmp/
     blue "开始移除 Android 签名校验" "Disalbe Android 14 Apk Signature Verfier"
