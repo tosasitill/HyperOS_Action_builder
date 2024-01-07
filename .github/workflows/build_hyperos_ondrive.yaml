@@ -25,8 +25,8 @@ jobs:
         uses: actions/checkout@main
       - name: 1.准备环境
         run: |
-          start_time=$SECONDS
-          sudo apt install python3 python3-pip aria2 zip p7zip-full tar zipalign zstd openjdk-8-jre android-sdk-libsparse-utils
+          
+          sudo apt install python3 python3-pip apktool aria2 zip p7zip-full tar zipalign zstd openjdk-8-jre android-sdk-libsparse-utils
           sudo apt --fix-broken install
           sudo apt update --fix-missing
           pip3 install --upgrade pip
@@ -57,8 +57,14 @@ jobs:
           rm -rf devices.zip
       - name: 3. 开始移植
         run: |
+          echo "~~~~~~~~~~~~~~~~~~~~"
           ls 
+          echo "~~~~~~~~~~~~~~~~~~~~"
+          apktool --version
+          echo "~~~~~~~~~~~~~~~~~~~~"
           cd hyperos_port
+          realpath port.sh
+          echo "~~~~~~~~~~~~~~~~~~~~"
           sudo bash port.sh "${{ github.event.inputs.STOCK_URL }}" "${{ github.event.inputs.PORT_URL }}" | tee HyperOS_portlog.log
       - name: 4.上传到 OneDrive
         run: |
