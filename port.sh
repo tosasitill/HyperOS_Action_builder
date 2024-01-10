@@ -468,23 +468,6 @@ if [ -f "${baseDevicesOverlay}" ] && [ -f "${portDevicesOverlay}" ];then
     cp -rf ${baseDevicesOverlay} ${portDevicesOverlay}
 fi
 
-targetDevicesAndroidOverlay=$(find build/portrom/images/product -type f -name "DevicesAndroidOverlay.apk")
-if [[ -f $targetDevicesAndroidOverlay ]]; then
-    mkdir tmp/  
-    filename=$(basename $targetDevicesAndroidOverlay)
-    yellow "修复息屏和屏下指纹问题" "Fixing AOD issue: $filename ..."
-    targetDir=$(echo "$filename" | sed 's/\..*$//')
-    bin/apktool/apktool d $targetDevicesAndroidOverlay -o tmp/$targetDir -f > /dev/null 2>&1
-    search_pattern="com\.miui\.aod\/com\.miui\.aod\.doze\.DozeService"
-    replacement_pattern="com\.android\.systemui\/com\.android\.systemui\.doze\.DozeService"
-    for xml in $(find tmp/$targetDir -type f -name "*.xml");do
-        sed -i "s/$search_pattern/$replacement_pattern/g" $xml
-    done
-    bin/apktool/apktool b tmp/$targetDir -o tmp/$filename > /dev/null 2>&1 || error "apktool 打包失败" "apktool mod failed"
-    cp -rfv tmp/$filename $targetDevicesAndroidOverlay
-    rm -rf tmp
-fi
-
 baseSettingsRroDeviceHideStatusBarOverlay=$(find build/baserom/images/product -type f -name "SettingsRroDeviceHideStatusBarOverlay.apk")
 portSettingsRroDeviceHideStatusBarOverlay=$(find build/portrom/images/product -type f -name "SettingsRroDeviceHideStatusBarOverlay.apk")
 if [ -f "${baseSettingsRroDeviceHideStatusBarOverlay}" ] && [ -f "${portSettingsRroDeviceHideStatusBarOverlay}" ];then
@@ -647,31 +630,6 @@ else
     echo "ro.surface_flinger.set_idle_timer_ms=2147483647" >> build/portrom/images/vendor/default.prop
     echo "ro.surface_flinger.set_touch_timer_ms=2147483647" >> build/portrom/images/vendor/default.prop
     echo "ro.surface_flinger.set_display_power_timer_ms=2147483647" >> build/portrom/images/vendor/default.prop
-
-    APKTOOL="java -jar $work_dir/bin/apktool/apktool.jar"
-    mkdir -p tmp/
-    echo "开始移除 Android 签名校验"
-    cp -rf build/portrom/images/system/system/framework/services.jar tmp/services.apk
-    pushd tmp/
-    $APKTOOL d -q services.apk
-    target_method='getMinimumSignatureSchemeVersionForTargetSdk'
-    find services/smali_classes2/com/android/server/pm/ services/smali_classes2/com/android/server/pm/pkg/parsing/ -type f -name "*.smali" -exec grep -H "$target_method" {} \; | cut -d ':' -f 1 | while read i; do
-        hs=$(grep -n "$target_method" "$i" | cut -d ':' -f 1)
-        sz=$(tail -n +"$hs" "$i" | grep -m 1 "move-result" | tr -dc '0-9')
-        hs1=$(awk -v HS=$hs 'NR>=HS && /move-result /{print NR; exit}' "$i")
-        hss=$hs
-        sedsc="const/4 v${sz}, 0x0"
-    # 使用兼容的sed命令
-        sed "${hs},${hs1}d" "$i" > "$i.tmp" && mv "$i.tmp" "$i"
-        sed "${hss}i\\${sedsc}" "$i" > "$i.tmp" && mv "$i.tmp" "$i"
-        echo "${i} 修改成功"
-    done
-    echo "反编译成功，开始回编译"
-    popd
-    $APKTOOL b -q -f -c tmp/services/ -o tmp/services.jar
-
-    cp -rfv tmp/services.jar build/portrom/images/system/system/framework/services.jar
-
     
 fi
 
