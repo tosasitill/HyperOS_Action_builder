@@ -526,7 +526,7 @@ rm -rf build/portrom/images/system_ext/apex/com.android.vndk.v33.apex
 green "精简完毕"
 
 green "修复 AOD"
-cp -rf build/baserom/images/product/overlay/DevicesAndroidOverlay.apk build/baserom/images/vendor/overlay/
+sudo cp -rf build/portrom/images/product/overlay/DevicesAndroidOverlay.apk build/portrom/images/vendor/overlay/
 green "修复完毕"
 
 
