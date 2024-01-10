@@ -181,7 +181,7 @@ port_partition=$(grep "partition_to_port" bin/port_config |cut -d '=' -f 2)
 #super_list=$(grep "super_list" bin/port_config |cut -d '=' -f 2)
 repackext4=$(grep "repack_with_ext4" bin/port_config |cut -d '=' -f 2)
 brightness_fix_method=$(grep "brightness_fix_method" bin/port_config |cut -d '=' -f 2)
-start_time=$SECONDS
+
 compatible_matrix_matches_enabled=$(grep "compatible_matrix_matches_check" bin/port_config | cut -d '=' -f 2)
 
 # 检查为本地包还是链接
