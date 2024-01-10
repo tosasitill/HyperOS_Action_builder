@@ -25,6 +25,7 @@ jobs:
         uses: actions/checkout@main
       - name: 1.准备环境
         run: |
+          start_time=$SECONDS
           sudo apt install aria2 python3 busybox zip tar apktool unzip p7zip-full openjdk-8-jre zipalign zstd bc android-sdk-libsparse-utils
           sudo apt --fix-broken install
           sudo apt update --fix-missing
