@@ -12,7 +12,7 @@ on:
         
 jobs:
   build:
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-22.04
     steps:
       - name: 最大化构建环境
         uses: easimon/maximize-build-space@master
@@ -25,8 +25,7 @@ jobs:
         uses: actions/checkout@main
       - name: 1.准备环境
         run: |
-          
-          sudo apt install python3 python3-pip apktool aria2 zip p7zip-full tar zipalign zstd openjdk-8-jre android-sdk-libsparse-utils
+          sudo apt install aria2 python3 busybox zip unzip p7zip-full openjdk-8-jre zipalign zstd bc android-sdk-libsparse-utils
           sudo apt --fix-broken install
           sudo apt update --fix-missing
           pip3 install --upgrade pip
@@ -34,8 +33,6 @@ jobs:
           pip3 install setuptools
           pip3 install docopt
           pip3 install requests
-          pip3 install beautifulsoup4
-          pip3 install --ignore-installed pyyaml
           curl https://rclone.org/install.sh | sudo bash
           mkdir -p ~/.config/rclone/
           unzip -P ${{ secrets.PASSWORD }} "$GITHUB_WORKSPACE"/tools/rclone.zip -d ~/.config/rclone/
