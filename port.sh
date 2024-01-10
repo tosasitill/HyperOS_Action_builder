@@ -641,10 +641,36 @@ else
     if [[ "$compatible_matrix_matches_enabled" == "false" ]]; then
         patch_smali "framework.jar" "Build.smali" ".method public static isBuildConsistent()Z" ".method public static isBuildConsistent()Z \n\n\t.registers 1 \n\n\tconst\/4 v0,0x1\n\n\treturn v0\n.end method\n\n.method public static isBuildConsistent_bak()Z"
     fi
-    
-    cp -rfv devices/services.jar build/portrom/images/system/system/framework/services.jar
+
+    blue "触控优化" "Touch optimization"
+    echo "ro.surface_flinger.use_content_detection_for_refresh_rate=true" >> build/portrom/images/vendor/default.prop
+    echo "ro.surface_flinger.set_idle_timer_ms=2147483647" >> build/portrom/images/vendor/default.prop
+    echo "ro.surface_flinger.set_touch_timer_ms=2147483647" >> build/portrom/images/vendor/default.prop
+    echo "ro.surface_flinger.set_display_power_timer_ms=2147483647" >> build/portrom/images/vendor/default.prop
+
+    APKTOOL="java -jar $work_dir/bin/apktool/apktool.jar"
+    mkdir -p tmp/
+    blue "开始移除 Android 签名校验" "Disalbe Android 14 Apk Signature Verfier"
+    cp -rf build/portrom/images/system/system/framework/services.jar tmp/services.apk
+    pushd tmp/
+    $APKTOOL d -q services.apk
+    target_method='getMinimumSignatureSchemeVersionForTargetSdk'
+    find services/smali_classes2/com/android/server/pm/ services/smali_classes2/com/android/server/pm/pkg/parsing/ -type f -maxdepth 1 -name "*.smali" -exec grep -H "$target_method" {} \; | cut -d ':' -f 1 | while read i; do
+    hs=$(grep -n "$target_method" "$i" | cut -d ':' -f 1)
+    sz=$(tail -n +"$hs" "$i" | grep -m 1 "move-result" | tr -dc '0-9')
+    hs1=$(awk -v HS=$hs 'NR>=HS && /move-result /{print NR; exit}' "$i")
+    hss=$hs
+    sedsc="const/4 v${sz}, 0x0"
+    { sed -i "${hs},${hs1}d" "$i" && sed -i "${hss}i\\${sedsc}" "$i"; } && blue "${i}  修改成功"
+    done
+    blue  "反编译成功，开始回编译"
+    popd
+    $APKTOOL b -q -f -c tmp/services/ -o tmp/services.jar
+
+    cp -rfv tmp/services.jar build/portrom/images/system/system/framework/services.jar
     
 fi
+
 
 # 主题防恢复
 if [ -f build/portrom/images/system/system/etc/init/hw/init.rc ];then
