@@ -520,10 +520,15 @@ cp -rf devices/nfc/lib64/vendor.nxp.hardware.nfc@2.0.so build/portrom/images/ven
 green "NFC修复成功"
 
 green "正在精简无用的 VNDK"
-rm -rf build/baserom/images/system_ext/apex/com.android.vndk.v31.apex
-rm -rf build/baserom/images/system_ext/apex/com.android.vndk.v32.apex
-rm -rf build/baserom/images/system_ext/apex/com.android.vndk.v33.apex
+rm -rf build/portrom/images/system_ext/apex/com.android.vndk.v31.apex
+rm -rf build/portrom/images/system_ext/apex/com.android.vndk.v32.apex
+rm -rf build/portrom/images/system_ext/apex/com.android.vndk.v33.apex
 green "精简完毕"
+
+green "修复 AOD"
+cp -rf build/baserom/images/product/overlay/DevicesAndroidOverlay.apk build/baserom/images/vendor/overlay/
+green "修复完毕"
+
 
 # device_features
 blue "复制设备特性XML文件"   
