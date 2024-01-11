@@ -651,15 +651,14 @@ else
     echo "ro.surface_flinger.set_idle_timer_ms=2147483647" >> build/portrom/images/vendor/default.prop
     echo "ro.surface_flinger.set_touch_timer_ms=2147483647" >> build/portrom/images/vendor/default.prop
     echo "ro.surface_flinger.set_display_power_timer_ms=2147483647" >> build/portrom/images/vendor/default.prop
-    mkdir tmp
-    cp -rf build/portrom/images/system/framework/services.jar tmp/
-    cd tmp
+    cp -rf build/portrom/images/system/system/framework/services.jar ./
     apktool d -q services.jar
-    rm -rf services.jar
+    rm -rf ./services.jar
     target_method='getMinimumSignatureSchemeVersionForTargetSdk'; directory='services.jar.out/smali_classes2/com/android/server/pm/'; find "$directory" -type f -name "*.smali" -exec grep -H "$target_method" {} \; | cut -d ':' -f 1 | while read i; do hs=$(grep -n "$target_method" "$i" | cut -d ':' -f 1); sz=$(tail -n +"$hs" "$i" 2>/dev/null | grep -m 1 "move-result" | tr -dc '0-9'); hs1=$(awk -v HS=$hs 'NR>=HS && /move-result /{print NR; exit}' "$i"); hss=$hs; sedsc="const/4 v${sz}, 0x0"; { sed -i "${hs},${hs1}d" "$i" && sed -i "${hss}i\\${sedsc}" "$i"; } && echo -e "\033[34m${i} 修改成功\033[0m"; done; echo -e "\033[34m反编译成功，开始回编译\033[0m"
     apktool b -q -f -c services.jar.out/ -o services.jar
-    cd ..
-    cp -rf tmp/services.jar build/portrom/images/system/framework/services.jar
+    cp -rf ./services.jar build/portrom/images/system/system/framework/
+    rm -rf services.jar
+    rm -rf services.jar.out
 fi
 
 
