@@ -542,23 +542,7 @@ for prop in $(find build/baserom/images/product build/baserom/images/system -typ
         break 
     fi
 done
-# 修复AOD问题
-targetDevicesAndroidOverlay=$(find build/portrom/images/product -type f -name "DevicesAndroidOverlay.apk")
-if [[ -f $targetDevicesAndroidOverlay ]]; then
-    mkdir tmp/  
-    filename=$(basename $targetDevicesAndroidOverlay)
-    yellow "修复息屏和屏下指纹问题" "Fixing AOD issue: $filename ..."
-    targetDir=$(echo "$filename" | sed 's/\..*$//')
-    bin/apktool/apktool d $targetDevicesAndroidOverlay -o tmp/$targetDir -f > /dev/null 2>&1
-    search_pattern="com\.miui\.aod\/com\.miui\.aod\.doze\.DozeService"
-    replacement_pattern="com\.android\.systemui\/com\.android\.systemui\.doze\.DozeService"
-    for xml in $(find tmp/$targetDir -type f -name "*.xml");do
-        sed -i "s/$search_pattern/$replacement_pattern/g" $xml
-    done
-    bin/apktool/apktool b tmp/$targetDir -o tmp/$filename > /dev/null 2>&1 || error "apktool 打包失败" "apktool mod failed"
-    cp -rfv tmp/$filename $targetDevicesAndroidOverlay
-    rm -rf tmp
-fi
+
 # 未在底包找到则默认440,如果是其他值可自己修改
 [ -z ${base_rom_density} ] && base_rom_density=440
 
@@ -651,14 +635,6 @@ else
     echo "ro.surface_flinger.set_idle_timer_ms=2147483647" >> build/portrom/images/vendor/default.prop
     echo "ro.surface_flinger.set_touch_timer_ms=2147483647" >> build/portrom/images/vendor/default.prop
     echo "ro.surface_flinger.set_display_power_timer_ms=2147483647" >> build/portrom/images/vendor/default.prop
-    cp -rf build/portrom/images/system/system/framework/services.jar ./
-    apktool d -q services.jar
-    rm -rf ./services.jar
-    target_method='getMinimumSignatureSchemeVersionForTargetSdk'; directory='services.jar.out/smali_classes2/com/android/server/pm/'; find "$directory" -type f -name "*.smali" -exec grep -H "$target_method" {} \; | cut -d ':' -f 1 | while read i; do hs=$(grep -n "$target_method" "$i" | cut -d ':' -f 1); sz=$(tail -n +"$hs" "$i" 2>/dev/null | grep -m 1 "move-result" | tr -dc '0-9'); hs1=$(awk -v HS=$hs 'NR>=HS && /move-result /{print NR; exit}' "$i"); hss=$hs; sedsc="const/4 v${sz}, 0x0"; { sed -i "${hs},${hs1}d" "$i" && sed -i "${hss}i\\${sedsc}" "$i"; } && echo -e "\033[34m${i} 修改成功\033[0m"; done; echo -e "\033[34m反编译成功，开始回编译\033[0m"
-    apktool b -q -f -c services.jar.out/ -o services.jar
-    cp -rf ./services.jar build/portrom/images/system/system/framework/
-    rm -rf services.jar
-    rm -rf services.jar.out
 fi
 
 
