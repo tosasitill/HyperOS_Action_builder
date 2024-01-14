@@ -525,6 +525,13 @@ rm -rf build/portrom/images/system_ext/apex/com.android.vndk.v32.apex
 rm -rf build/portrom/images/system_ext/apex/com.android.vndk.v33.apex
 green "精简完毕"
 
+blue "优化流畅性 PROP 来自 K60 "
+echo "persist.vendor.mi_sf.optimize_for_refresh_rate.enable=1" >> build/portrom/images/vendor/build.prop
+echo "ro.vendor.mi_sf.ultimate.perf.support=true"  >> build/portrom/images/vendor/build.prop
+echo "ro.surface_flinger.set_touch_timer_ms=200" >> build/portrom/images/vendor/build.prop
+echo "ro.surface_flinger.set_idle_timer_ms=1100" >> build/portrom/images/vendor/build.prop
+echo "debug.sf.set_idle_timer_ms=1100" >> build/portrom/images/vendor/build.prop
+
 green "修复 AOD"
 sudo cp -rf build/portrom/images/product/overlay/DevicesAndroidOverlay.apk build/portrom/images/vendor/overlay/
 green "修复完毕"
