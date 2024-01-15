@@ -11,7 +11,7 @@
 # 2023.12.26
 
 build_user="Bruce Teng, tosasitill"
-build_host="pangu-build-fuxi_tosasitill"
+build_host="pangu-build-Ubuntu_tosasitill"
 
 # 底包和移植包为外部参数传入
 baserom="$1"
