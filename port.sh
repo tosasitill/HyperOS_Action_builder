@@ -558,6 +558,24 @@ for prop in $(find build/baserom/images/product build/baserom/images/system -typ
     fi
 done
 
+targetDevicesAndroidOverlay=$(find build/portrom/images/product -type f -name "DevicesAndroidOverlay.apk")
+if [[ -f $targetDevicesAndroidOverlay ]]; then
+    mkdir tmp/  
+    filename=$(basename $targetDevicesAndroidOverlay)
+    yellow "修复息屏和屏下指纹问题" "Fixing AOD issue: $filename ..."
+    targetDir=$(echo "$filename" | sed 's/\..*$//')
+    bin/apktool/apktool d $targetDevicesAndroidOverlay -o tmp/$targetDir -f > /dev/null 2>&1
+    search_pattern="com\.miui\.aod\/com\.miui\.aod\.doze\.DozeService"
+    replacement_pattern="com\.android\.systemui\/com\.android\.systemui\.doze\.DozeService"
+    for xml in $(find tmp/$targetDir -type f -name "*.xml");do
+        sed -i "s/$search_pattern/$replacement_pattern/g" $xml
+    done
+    bin/apktool/apktool b tmp/$targetDir -o tmp/$filename > /dev/null 2>&1 || error "apktool 打包失败" "apktool mod failed"
+    cp -rfv tmp/$filename $targetDevicesAndroidOverlay
+    rm -rf tmp
+fi
+
+
 # 未在底包找到则默认440,如果是其他值可自己修改
 [ -z ${base_rom_density} ] && base_rom_density=440
 
