@@ -630,7 +630,12 @@ mkdir build/portrom/images/product/priv-app/MiuiCamera
 cp -rf devices/MiuiCamera.apk build/portrom/images/product/priv-app/MiuiCamera/
 
 green "修复GPU驱动卡顿"
-
+blue "触控优化" "Touch optimization"
+    echo "ro.surface_flinger.use_content_detection_for_refresh_rate=true" >> build/portrom/images/vendor/default.prop
+    echo "ro.surface_flinger.set_idle_timer_ms=2147483647" >> build/portrom/images/vendor/default.prop
+    echo "ro.surface_flinger.set_touch_timer_ms=2147483647" >> build/portrom/images/vendor/default.prop
+    echo "ro.surface_flinger.set_display_power_timer_ms=2147483647" >> build/portrom/images/vendor/default.prop
+    
 #解决开机报错问题
 targetVintf=$(find build/portrom/images/system_ext/etc/vintf -type f -name "manifest.xml")
 if [ -f "$targetVintf" ]; then
@@ -700,7 +705,7 @@ else
         blue "反编译成功，开始回编译 $smali_dir"
         java -jar bin/apktool/smali.jar a --api ${port_android_sdk} tmp/services/${smali_dir} -o tmp/services/${smali_dir}.dex
         pushd tmp/services/ > /dev/null 2>&1
-        7z a -y -mx0 -tzip tmp/services/services.jar ${smali_dir}.dex > /dev/null 2>&1
+        7z a -y -mx0 -tzip services.jar ${smali_dir}.dex > /dev/null 2>&1
         popd > /dev/null 2>&1
     done
     
