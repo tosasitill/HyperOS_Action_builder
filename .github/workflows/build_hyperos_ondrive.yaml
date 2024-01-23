@@ -41,8 +41,8 @@ jobs:
 
       - name: Add MIUI/HyperOS ROMs hosts to /etc/hosts
         run: |
-          sudo echo "111.31.36.169 bigota.d.miui.com" | sudo tee -a /etc/hosts
-          sudo echo "111.31.36.169 hugeota.d.miui.com" | sudo tee -a /etc/hosts
+          sudo echo "47.74.196.250 bigota.d.miui.com" | sudo tee -a /etc/hosts
+          sudo echo "47.74.196.250 hugeota.d.miui.com" | sudo tee -a /etc/hosts
    
       - name: 2.克隆仓库
         run: |
