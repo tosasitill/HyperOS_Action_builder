@@ -5,7 +5,7 @@ on:
       STOCK_URL:
         description: "待操作的底包/xiaomi.eu底包下载地址"
         required: true
-        default: 'https://bigota.d.miui.com/V14.0.7.0.TKKCNXM/miui_HAYDN_V14.0.7.0.TKKCNXM_62f554b4aa_13.0.zip'
+        default: 'https://cdnorg.d.miui.com/V14.0.8.0.TKKCNXM/miui_HAYDN_V14.0.8.0.TKKCNXM_e3deaf183b_13.0.zip'
       PORT_URL:
         description: "待操作的移植包下载地址"
         required: true
@@ -25,25 +25,15 @@ jobs:
         uses: actions/checkout@main
       - name: 1.准备环境
         run: |
-          start_time=$SECONDS
           sudo apt install aria2 python3 busybox zip tar apktool unzip p7zip-full openjdk-8-jre zipalign zstd bc android-sdk-libsparse-utils
           sudo apt --fix-broken install
           sudo apt update --fix-missing
           pip3 install --upgrade pip
-          pip3 install pycryptodome
-          pip3 install setuptools
-          pip3 install docopt
-          pip3 install requests
+          pip3 install pycryptodome requests setuptools docopt
           curl https://rclone.org/install.sh | sudo bash
           mkdir -p ~/.config/rclone/
           unzip -P ${{ secrets.PASSWORD }} "$GITHUB_WORKSPACE"/tools/rclone.zip -d ~/.config/rclone/
           curl -X POST -H "Content-Type: application/json" -d '{"msg_type": "post", "content": {"post": {"zh_cn": {"title": "HyperOS云端移植进度更新通知", "content": [[{"tag": "text", "text": "任务GITHUB WORKFLOWS编号为:${{ github.run_id }}         "}, {"tag": "text", "text": "环境配置完成!开始下载镜像并移植!"}]]}}}}' ${{ secrets.FEISHU }}
-
-      - name: Add MIUI/HyperOS ROMs hosts to /etc/hosts
-        run: |
-          sudo echo "47.74.196.250 bigota.d.miui.com" | sudo tee -a /etc/hosts
-          sudo echo "47.74.196.250 hugeota.d.miui.com" | sudo tee -a /etc/hosts
-   
       - name: 2.克隆仓库
         run: |
           git clone --depth 1 https://github.com/tosasitill/HyperOS_Action_builder hyperos_port
@@ -56,25 +46,15 @@ jobs:
           rm -rf devices.zip
       - name: 3. 开始移植
         run: |
-          echo "~~~~~~~~~~~~~~~~~~~~"
-          ls 
-          echo "~~~~~~~~~~~~~~~~~~~~"
-          apktool --version
-          echo "~~~~~~~~~~~~~~~~~~~~"
           cd hyperos_port
-          realpath port.sh
-          echo "~~~~~~~~~~~~~~~~~~~~"
           sudo bash port.sh "${{ github.event.inputs.STOCK_URL }}" "${{ github.event.inputs.PORT_URL }}" | tee HyperOS_portlog.log
       - name: 4.上传到 OneDrive
         run: |
             curl -X POST -H "Content-Type: application/json" -d '{"msg_type": "post", "content": {"post": {"zh_cn": {"title": "HyperOS云端移植进度更新通知", "content": [[{"tag": "text", "text": "任务GITHUB WORKFLOWS编号为:${{ github.run_id }}         "}, {"tag": "text", "text": "移植完成!开始上传 OneDrive"}]]}}}}' ${{ secrets.FEISHU }}
             rclone sync -P ./hyperos_port/out/*.zip tosasitill_hyper:/haydn
-            end_time=$SECONDS
-            elapsed_time=$((end_time - start_time))
             cd ${{ github.workspace }}
             touch info.md
             echo "提交日期：$(TZ=Asia/Shanghai date '+%Y-%m-%d %H:%M:%S')" >> info.md
-            echo "本次移植共耗时 ${elapsed_time} 秒" >> info.md
             echo "移植底包链接：${{ github.event.inputs.STOCK_URL }}" >> info.md
             echo "移植机型链接：${{ github.event.inputs.PORT_URL }}" >> info.md
             echo "tosasitill made with love 0202 & 0227" >> info.md
@@ -82,7 +62,7 @@ jobs:
       - name: 5.上传本次打包 LOG 至 Release
         uses: ncipollo/release-action@v1.12.0
         with:
-            artifacts: "/home/runner/work/HyperOS_Action_builder/HyperOS_Action_builder/hyperos_port/build/portrom/images/system/system/framework/services.jar"
+            artifacts: "/home/runner/work/HyperOS_Action_builder/HyperOS_Action_builder/hyperos_port/HyperOS_portlog.log"
             bodyfile: "${{ github.workspace }}/info.md"
             tag: "OUTPUT_${{ env.BUILD_TIME }}_${{ github.run_id }}"
             token: ${{ secrets.GITHUB_TOKEN }}
