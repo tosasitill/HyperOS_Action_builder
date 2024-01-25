@@ -671,45 +671,14 @@ else
         mkdir -p tmp/
     fi
     blue "开始移除 Android 签名校验" "Disalbe Android 14 Apk Signature Verfier"
-    mkdir -p tmp/services/
-    cp -rf build/portrom/images/system/system/framework/services.jar tmp/services/services.jar
-    
-    7z x -y tmp/services/services.jar *.dex -otmp/services > /dev/null 2>&1
-    target_method='getMinimumSignatureSchemeVersionForTargetSdk' 
-    for dexfile in tmp/services/*.dex;do
-        smali_fname=${dexfile%.*}
-        smali_base_folder=$(echo $smali_fname | cut -d "/" -f 3)
-        java -jar bin/apktool/baksmali.jar d --api ${port_android_sdk} ${dexfile} -o tmp/services/$smali_base_folder
-    done
-
-    old_smali_dir=""
-    declare -a smali_dirs
-
-    while read -r smali_file; do
-        smali_dir=$(echo "$smali_file" | cut -d "/" -f 3)
-
-        if [[ $smali_dir != $old_smali_dir ]]; then
-            smali_dirs+=("$smali_dir")
-        fi
-
-        method_line=$(grep -n "$target_method" "$smali_file" | cut -d ':' -f 1)
-        register_number=$(tail -n +"$method_line" "$smali_file" | grep -m 1 "move-result" | tr -dc '0-9')
-        move_result_end_line=$(awk -v ML=$method_line 'NR>=ML && /move-result /{print NR; exit}' "$smali_file")
-        orginal_line_number=$method_line
-        replace_with_command="const/4 v${register_number}, 0x0"
-        { sed -i "${orginal_line_number},${move_result_end_line}d" "$smali_file" && sed -i "${orginal_line_number}i\\${replace_with_command}" "$smali_file"; } &&    blue "${smali_file}  修改成功"
-        old_smali_dir=$smali_dir
-    done < <(find tmp/services -type f -name "*.smali" -exec grep -H "$target_method" {} \; | cut -d ':' -f 1)
-
-    for smali_dir in "${smali_dirs[@]}"; do
-        blue "反编译成功，开始回编译 $smali_dir"
-        java -jar bin/apktool/smali.jar a --api ${port_android_sdk} tmp/services/${smali_dir} -o tmp/services/${smali_dir}.dex
-        pushd tmp/services/ > /dev/null 2>&1
-        7z a -y -mx0 -tzip services.jar ${smali_dir}.dex > /dev/null 2>&1
-        popd > /dev/null 2>&1
-    done
-    
-    cp -rfv tmp/services/services.jar build/portrom/images/system/system/framework/services.jar
+    mkdir -p tmp/
+    cp -rf build/portrom/images/system/system/framework/services.jar tmp/services.jar
+    apktool d tmp/services.jar
+    rm -rf services.jar
+    cp -rf bin/ser/* tmp/services.jar.out/smail/com/android/server/
+    find "tmp/services.jar.out/" -type f -name "*.smali" -exec sed -i 's#Landroid/util/apk/ApkSignatureVerifier;->getMinimumSignatureSchemeVersionForTargetSdk(I)I#Lcom/android/server/weverse/BypassSignCheck;->getMinimumSignatureSchemeVersionForTargetSdk(I)I#g' "{}" +
+    apktool b tmp/services.jar.out -o tmp/services.jar
+    cp -rfv tmp/services.jar build/portrom/images/system/system/framework/services.jar
     
 fi
 
