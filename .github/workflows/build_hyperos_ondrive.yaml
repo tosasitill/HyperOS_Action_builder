@@ -59,10 +59,17 @@ jobs:
             echo "移植机型链接：${{ github.event.inputs.PORT_URL }}" >> info.md
             echo "tosasitill made with love 0202 & 0227" >> info.md
             
-      - name: 5.上传本次打包 LOG 至 Release
+      - name: 5.发布完成 Release
         uses: ncipollo/release-action@v1.12.0
         with:
             artifacts: "/home/runner/work/HyperOS_Action_builder/HyperOS_Action_builder/hyperos_port/HyperOS_portlog.log"
             bodyfile: "${{ github.workspace }}/info.md"
             tag: "OUTPUT_${{ env.BUILD_TIME }}_${{ github.run_id }}"
             token: ${{ secrets.GITHUB_TOKEN }}
+            
+      - name: 5.上传移植LOG
+        uses: actions/upload-artifact@v4
+        with:
+          name: HyperOS-PortLOG
+          path: "/home/runner/work/HyperOS_Action_builder/HyperOS_Action_builder/hyperos_port/HyperOS_portlog.log"
+          compression-level: 9
