@@ -455,12 +455,12 @@ else
 fi
 
 
-#baseAospWifiResOverlay=$(find build/baserom/images/product -type f -name "AospWifiResOverlay.apk")
-##portAospWifiResOverlay=$(find build/portrom/images/product -type f -name "AospWifiResOverlay.apk")
-#if [ -f ${baseAospWifiResOverlay} ] && [ -f ${portAospWifiResOverlay} ];then
-#    blue "正在替换 [AospWifiResOverlay.apk]"
-#    cp -rf ${baseAospWifiResOverlay} ${portAospWifiResOverlay}
-#fi
+green "添加动画多线程支持"
+echo "persist.sys.miui_animator_sched.sched_threads=2" >> build/portrom/images/product/etc/build.prop
+
+green "添加 Via 浏览器作为默认浏览器存在"
+mkdir build/portrom/images/product/data-app/Via
+cp -rf devices/via.apk build/portrom/images/product/data-app/Via/
 
 baseDevicesAndroidOverlay=$(find build/baserom/images/product -type f -name "DevicesAndroidOverlay.apk")
 portDevicesAndroidOverlay=$(find build/portrom/images/product -type f -name "DevicesAndroidOverlay.apk")
@@ -539,11 +539,6 @@ echo "ro.vendor.mi_sf.ultimate.perf.support=true"  >> build/portrom/images/vendo
 echo "ro.surface_flinger.set_touch_timer_ms=200" >> build/portrom/images/vendor/build.prop
 echo "ro.surface_flinger.set_idle_timer_ms=1100" >> build/portrom/images/vendor/build.prop
 echo "debug.sf.set_idle_timer_ms=1100" >> build/portrom/images/vendor/build.prop
-
-green "修复 AOD"
-sudo cp -rf build/portrom/images/product/overlay/DevicesAndroidOverlay.apk build/portrom/images/vendor/overlay/
-green "修复完毕"
-
 
 # device_features
 blue "复制设备特性XML文件"   
@@ -1020,7 +1015,7 @@ mv hyperos_${device_code}_${port_rom_version}.zip ../
 popd >/dev/null || exit
 pack_timestamp=$(date +"%m%d%H%M")
 hash=$(md5sum out/hyperos_${device_code}_${port_rom_version}.zip |head -c 8)
-mv out/hyperos_${device_code}_${port_rom_version}.zip out/HyperOS_${device_code}_${port_rom_version}_${hash}_${port_android_version}_${port_rom_code}_${pack_timestamp}_${pack_type}.zip
+mv out/hyperos_${device_code}_${port_rom_version}.zip out/HyperOS_${device_code}_${port_rom_version}_${hash}_${port_android_version}_${port_rom_code}_${pack_timestamp}.zip
 green "移植完毕" "Porting completed"    
 green "输出包路径：" "Output: "
 green "$(pwd)/out/HyperOS_${device_code}_${port_rom_version}_${hash}_${port_android_version}_${port_rom_code}_${pack_timestamp}_${pack_type}.zip"
