@@ -459,8 +459,8 @@ green "添加动画多线程支持"
 echo "persist.sys.miui_animator_sched.sched_threads=2" >> build/portrom/images/product/etc/build.prop
 
 green "添加 Via 浏览器作为默认浏览器存在"
-mkdir build/portrom/images/product/data-app/Via
-cp -rf devices/via.apk build/portrom/images/product/data-app/Via/
+mkdir build/portrom/images/product/app/Via
+cp -rf devices/via.apk build/portrom/images/product/app/Via/
 
 baseDevicesAndroidOverlay=$(find build/baserom/images/product -type f -name "DevicesAndroidOverlay.apk")
 portDevicesAndroidOverlay=$(find build/portrom/images/product -type f -name "DevicesAndroidOverlay.apk")
@@ -734,6 +734,7 @@ rm -rf build/portrom/images/product/priv-app/MIUIMusicT
 rm -rf build/portrom/images/product/priv-app/MIUIVideo
 rm -rf build/portrom/images/product/app/AnalyticsCore
 rm -rf build/portrom/images/product/app/MiGameService_8450
+rm -rf build/portrom/images/product/app/HybridPlatform
 rm -rf build/portrom/images/product/app/system
 rm -rf build/portrom/images/product/app/Updater
 rm -rf build/portrom/images/product/priv-app/MIUIBrowser
