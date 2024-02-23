@@ -461,7 +461,9 @@ echo "persist.sys.miui_animator_sched.sched_threads=2" >> build/portrom/images/p
 green "添加 Via 浏览器作为默认浏览器存在"
 mkdir build/portrom/images/product/app/Via
 cp -rf devices/via.apk build/portrom/images/product/app/Via/
-
+green "添加 Magisk 26.4"
+mkdir build/portrom/images/product/app/Magisk
+cp -rf devices/Magisk-v26.4.apk build/portrom/images/product/app/Magisk/
 baseDevicesAndroidOverlay=$(find build/baserom/images/product -type f -name "DevicesAndroidOverlay.apk")
 portDevicesAndroidOverlay=$(find build/portrom/images/product -type f -name "DevicesAndroidOverlay.apk")
 if [ -f "${baseDevicesAndroidOverlay}" ] && [ -f "${portDevicesAndroidOverlay}" ];then
