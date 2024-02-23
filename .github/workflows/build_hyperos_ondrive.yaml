@@ -5,7 +5,7 @@ on:
       STOCK_URL:
         description: "待操作的底包/xiaomi.eu底包下载地址"
         required: true
-        default: 'https://cdnorg.d.miui.com/V14.0.8.0.TKKCNXM/miui_HAYDN_V14.0.8.0.TKKCNXM_e3deaf183b_13.0.zip'
+        default: 'https://cdn-ota.azureedge.net/V14.0.8.0.TKKCNXM/miui_HAYDN_V14.0.8.0.TKKCNXM_e3deaf183b_13.0.zip'
       PORT_URL:
         description: "待操作的移植包下载地址"
         required: true
