@@ -663,9 +663,6 @@ for prop_file in $(find build/portrom/images/vendor/ -name "*.prop"); do
     fi
 done
 
-# 修复可能缺失的 APEX v30
-cp -rf build/baserom/images/system_ext/apex/com.android.vndk.v30.apex build/portrom/images/system_ext/apex/
-
 green "正在替换徕卡相机APK"
 rm -rf build/portrom/images/product/priv-app/MiuiCamera
 mkdir build/portrom/images/product/priv-app/MiuiCamera
